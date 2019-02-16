@@ -14,8 +14,8 @@
 <body>
 
 <div class="jumbotron text-center" style="margin-bottom:0">
-    <h1>Game Master's Workshop</h1>
-    <p>Made by Utku Erol</p>
+    <h1> {% block campaign_name %}{% endblock %} </h1>
+    <p>{% block gm_name %}{% endblock %}</p>
 </div>
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
@@ -26,17 +26,26 @@
 
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
 
-    {% if user.is_authenticated %}
+        {% block campaign-nav-left %}
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" href="/campaigns/">Campaigns</a>
+                <a class="nav-link" href="#">Your Character</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/characters/">Characters</a>
+                <a class="nav-link" href="#">Known Characters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Known Locations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Known Lores</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Explore</a>
             </li>
         </ul>
-    {% endif %}
 
+        {% endblock %}
 
         <!-- Right Side Of Navbar -->
         <ul class="navbar-nav ml-auto">
@@ -82,9 +91,9 @@
     {% endblock %}
 </div>
 
-<div class="footer text-center bg-dark" style="margin-top:15px; position: absolute; bottom: 0; width: 100%;">
+{% comment %}<div class="footer text-center bg-dark" style="margin-top:15px; position: absolute; bottom: 0; width: 100%;">
     <p class="text-white-50" style="padding-top: 7px">Really cool footer</p>
-</div>
+</div>{% endcomment %}
 
 </body>
 </html>

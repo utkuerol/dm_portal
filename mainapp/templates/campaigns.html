@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %} Campaigns {% endblock %}
+
+{% block content %}
+    {% if campaigns %}
+        <div class="card-group">
+            {% for campaign in campaigns %}
+                <div class="card">
+                    <div class="card-body">
+                        <a href="{% url 'campaign-profile' pk=campaign.id %}">
+                            <h5 class="card-title">{{ campaign.name }}</h5></a>
+                        <p class="card-text">{{ campaign.description }}</p>
+                        <p class="card-text">
+                            {% if campaign.game_master == user %}
+                                <small class="text-muted">You are the GM</small>
+                            {% else %}
+                                <small class="text-muted">GM: {{ campaign.game_master }}</small>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">There are no campaigns. Would you like to start one?</h5>
+                <form action="{% url 'new-campaign' %}" method="get">
+                    <button type="submit" class="btn btn-primary bg-dark">New Campaign</button>
+                </form>
+
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

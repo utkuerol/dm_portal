@@ -1,0 +1,114 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} Campaign Home {% endblock %}
+
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
+
+{% block campaign-nav-left %}
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'campaign-profile' pk=campaign.id %}">Campaign Home</a>
+        </li>
+        {% if campaign.game_master != user and character %}
+            <li class="nav-item">
+                <a class="nav-link"
+                   href="{% url 'character-profile' pk=campaign.id charid=character.id knowncharid=character.id %}">Your
+                    Character</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Known
+                    Characters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Known
+                    Locations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Known Lores</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Explore</a>
+            </li>
+        {% endif %}
+        {% if campaign.game_master == user and character %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Characters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Locations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Lores</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Explore</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        <div class="card-header"><h5 class="card-title">Campaign Overview</h5></div>
+        <div class="card-body">
+            <p class="card-text">{{ campaign.description }}</p>
+            <p class="card-text">
+                {% if campaign.game_master == user %}
+                    <small class="text-muted">You are the GM</small>
+                {% else %}
+                    <small class="text-muted">GM: {{ campaign.game_master }}</small>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    {% if campaign.game_master != user %}
+        {% if character %}
+            <div class="card" style="margin-top: 15px">
+                <div class="card-header">Your Character</div>
+                <img class="card-img-top" src="{{ character.image }}" alt="Card image cap">
+                <div class="card-body">
+                    <h5 class="card-title">{{ character.name }}</h5>
+                    <p class="card-text">{{ character.description }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div class="card" style="margin-top: 15px">
+                <div class="card-header">Continue As:</div>
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'my-characters' pk=campaign.id %}">One of your characters</a>
+                    </h5>
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if campaign.game_master == user %}
+
+        <div class="card-group">
+            <div class="card" style="margin-top: 15px">
+                <div class="card-header">Manage Lore</div>
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'new-lore' pk=campaign.id charid=character.id %}">New
+                        Lore</a>
+                    </h5>
+                    <h5 class="card-title"><a href="{% url 'new-character' pk=campaign.id charid=character.id %}">New
+                        Character</a>
+                    </h5>
+                    <h5 class="card-title"><a href="{% url 'new-location' pk=campaign.id charid=character.id %}">New Location</a>
+                    </h5>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 15px">
+                <div class="card-header">Manage Players</div>
+                <div class="card-body">
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+
+{% endblock %}

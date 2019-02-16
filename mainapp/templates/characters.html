@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %} Characters {% endblock %}
+
+{% block content %}
+    <div class="card-group">
+        {% if characters %}
+            {% for character in characters %}
+                <div class="card">
+                    <img class="card-img-top" src="{{ character.image }}" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ character.name }}</h5>
+                        <p class="card-text">{{ character.description }}</p>
+                        <p class="card-text">Campaign: {{ character.campaign.name }}</p>
+
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">You don't have any characters!</h5>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
