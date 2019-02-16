@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0002_auto_20190212_2338'),
+        ('mainapp', '0002_auto_20190212_2338'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='character',
             name='known_characters',
-            field=models.ManyToManyField(blank=True, to='main.Character'),
+            field=models.ManyToManyField(blank=True, to='mainapp.Character'),
         ),
         migrations.AlterField(
             model_name='character',
             name='known_locations',
-            field=models.ManyToManyField(blank=True, to='main.Location'),
+            field=models.ManyToManyField(blank=True, to='mainapp.Location'),
         ),
         migrations.AlterField(
             model_name='character',
             name='known_lores',
-            field=models.ManyToManyField(blank=True, related_name='known_lores', to='main.Lore'),
+            field=models.ManyToManyField(blank=True, related_name='known_lores', to='mainapp.Lore'),
         ),
         migrations.AlterField(
             model_name='location',
             name='important_characters',
-            field=models.ManyToManyField(blank=True, to='main.Character'),
+            field=models.ManyToManyField(blank=True, to='mainapp.Character'),
         ),
     ]

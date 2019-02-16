@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0001_initial'),
+        ('mainapp', '0001_initial'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='character',
             name='known_characters',
-            field=models.ManyToManyField(null=True, to='main.Character'),
+            field=models.ManyToManyField(null=True, to='mainapp.Character'),
         ),
         migrations.AlterField(
             model_name='character',
             name='known_locations',
-            field=models.ManyToManyField(null=True, to='main.Location'),
+            field=models.ManyToManyField(null=True, to='mainapp.Location'),
         ),
         migrations.AlterField(
             model_name='location',
             name='important_characters',
-            field=models.ManyToManyField(null=True, to='main.Character'),
+            field=models.ManyToManyField(null=True, to='mainapp.Character'),
         ),
     ]
