@@ -1,0 +1,28 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} Locations {% endblock %}
+
+
+
+{% block content %}
+    <div class="card-group">
+        {% if locations %}
+            {% for location in locations %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ location.name }}</h5>
+                        <p class="card-text">{{ location.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">No locations found :(</h5>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

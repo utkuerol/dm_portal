@@ -1,0 +1,80 @@
+{% block campaign-nav-left %}
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'campaign-profile' pk=campaign.id %}">Campaign Home</a>
+        </li>
+        {% if campaign.game_master != user and character %}
+            <li class="nav-item">
+                <a class="nav-link"
+                   href="{% url 'character-profile' pk=campaign.id charid=character.id knowncharid=character.id %}">Your
+                    Character</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Known
+                    Characters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Known
+                    Locations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Known Lores</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Explore</a>
+            </li>
+        {% endif %}
+        {% if campaign.game_master == user and character %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Characters</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Locations</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Lores</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Explore</a>
+            </li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+
+        <!-- Right Side Of Navbar -->
+        <ul class="navbar-nav ml-auto">
+            <!-- Authentication Links -->
+            {% if user.is_authenticated %}
+                <li class="nav-item dropdown"
+                    style="flex-direction: column;"
+                >
+                    <a id="navbarDropdown" class="nav-link  flex items-center justify-between"
+                       href="#" role="button"
+                       data-toggle="dropdown"
+                       style="min-width: 150px; margin: auto;"
+                    >
+                                    <span class="">
+                                        {{ user.username }}
+                                    </span>
+                        <i class="fa fa-fw fa-2x fa-caret-down"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown"
+                         style="width: 100%;"
+                    >
+
+                        <a class="dropdown-item  flex items-center justify-between" href="{% url 'logout' %}">
+                            Log Out
+                            <i class="fa fa-fw fa-sign-out"></i>
+                        </a>
+                    </div>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url "login" %}">
+                        Log In
+                    </a>
+                </li>
+            {% endif %}
+
+        </ul>

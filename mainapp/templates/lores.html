@@ -1,0 +1,29 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} Lores {% endblock %}
+
+
+
+{% block content %}
+    <div class="card-group">
+        {% if locations %}
+            {% for lore in lores %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ lore.title }}</h5>
+                        <p class="card-text">Type: {{ lore.type }}</p>
+                        <p class="card-text">{{ lore.text_level1 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">No lores found :(</h5>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

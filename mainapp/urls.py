@@ -3,7 +3,7 @@ from django.urls import path
 from mainapp.views import CampaignsView, CharactersView, LoresView, LocationsView, \
     CampaignCharactersView, KnownLoresView, KnownLocationsView, KnownCharactersView, CampaignProfileView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
-    MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView
+    MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader
 
 urlpatterns = [
     path('campaigns/', CampaignsView.as_view(), name='campaigns'),
@@ -26,5 +26,6 @@ urlpatterns = [
     path('campaigns/<int:pk>/<int:charid>/locations/new', LocationCreateView.as_view(), name='new-location'),
     path('campaigns/<int:pk>/<int:charid>/lore/new', LoreCreateView.as_view(), name='new-lore'),
 
+    path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav')
 ]
 

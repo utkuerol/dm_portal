@@ -6,48 +6,6 @@
 {% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
 
 
-{% block campaign-nav-left %}
-    <ul class="navbar-nav">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'campaign-profile' pk=campaign.id %}">Campaign Home</a>
-        </li>
-        {% if campaign.game_master != user and character %}
-            <li class="nav-item">
-                <a class="nav-link"
-                   href="{% url 'character-profile' pk=campaign.id charid=character.id knowncharid=character.id %}">Your
-                    Character</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Known
-                    Characters</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Known
-                    Locations</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Known Lores</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Explore</a>
-            </li>
-        {% endif %}
-        {% if campaign.game_master == user and character %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-characters' pk=campaign.id charid=character.id %}">Characters</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-locations' pk=campaign.id charid=character.id %}">Locations</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'known-lores' pk=campaign.id charid=character.id %}">Lores</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Explore</a>
-            </li>
-        {% endif %}
-    </ul>
-{% endblock %}
 
 {% block content %}
 
