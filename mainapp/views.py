@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView
@@ -55,16 +56,16 @@ class CampaignCreateView(CreateView):
         id = self.object.id
         campaign = Campaign.objects.get(id=id)
         user = campaign.game_master
-        all_chars = Character.objects.filter(campaign=campaign)
-        all_locations = Location.objects.filter(campaign=campaign)
-        all_lores = Lore.objects.filter(campaign=campaign)
+        all_chars = list(Character.objects.filter(campaign=campaign))
+        all_locations = list(Location.objects.filter(campaign=campaign))
+        all_lores = list(Lore.objects.filter(campaign=campaign))
 
         gm_char = Character(name='Game Master', campaign=campaign, user=user)
         gm_char.save()
 
-        gm_char.known_characters.set(all_chars)
-        gm_char.known_lores.set(all_lores)
-        gm_char.known_locations.set(all_locations)
+        gm_char.known_characters.set(*all_chars)
+        gm_char.known_lores.set(*all_lores)
+        gm_char.known_locations.set(*all_locations)
         gm_char.save()
 
         campaign.players.add(user)
@@ -77,6 +78,23 @@ class CharacterCreateView(CreateView):
     model = Character
     template_name = 'new-character.html'
     fields = '__all__'
+
+    def form_valid(self, form):
+        form.save()
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
+        gm = campaign.game_master
+        gm_char = Character.objects.get(user=gm)
+
+        all_chars = list(Character.objects.filter(campaign=campaign))
+        all_locations = list(Location.objects.filter(campaign=campaign))
+        all_lores = list(Lore.objects.filter(campaign=campaign))
+        gm_char.known_characters.add(*all_chars)
+        gm_char.known_lores.add(*all_lores)
+        gm_char.known_locations.add(*all_locations)
+
+        return redirect('known-characters', pk=self.kwargs['pk'], charid=self.kwargs['charid'])
 
     def get_context_data(self, **kwargs):
         campaign_id = self.kwargs['pk']
@@ -93,6 +111,25 @@ class LocationCreateView(CreateView):
     template_name = 'new-location.html'
     fields = '__all__'
 
+    def form_valid(self, form):
+        form.save()
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
+        gm = campaign.game_master
+        gm_char = Character.objects.get(user=gm)
+
+        all_chars = list(Character.objects.filter(campaign=campaign))
+        all_locations = list(Location.objects.filter(campaign=campaign))
+        all_lores = list(Lore.objects.filter(campaign=campaign))
+
+        gm_char.known_characters.add(*all_chars)
+        gm_char.known_lores.add(*all_lores)
+        gm_char.known_locations.add(*all_locations)
+        gm_char.save()
+
+        return redirect('known-locations', pk=self.kwargs['pk'], charid=self.kwargs['charid'])
+
     def get_context_data(self, **kwargs):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
@@ -107,6 +144,25 @@ class LoreCreateView(CreateView):
     model = Lore
     template_name = 'new-lore.html'
     fields = '__all__'
+
+    def form_valid(self, form):
+        form.save()
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
+        gm = campaign.game_master
+        gm_char = Character.objects.get(user=gm)
+
+        all_chars = list(Character.objects.filter(campaign=campaign))
+        all_locations = list(Location.objects.filter(campaign=campaign))
+        all_lores = list(Lore.objects.filter(campaign=campaign))
+
+        gm_char.known_characters.set(*all_chars)
+        gm_char.known_lores.set(*all_lores)
+        gm_char.known_locations.set(*all_locations)
+        gm_char.save()
+
+        return redirect('known-lores', pk=self.kwargs['pk'], charid=self.kwargs['charid'])
 
     def get_context_data(self, **kwargs):
         campaign_id = self.kwargs['pk']
@@ -131,8 +187,8 @@ class CampaignProfileView(DetailView):
         campaign = Campaign.objects.get(id=campaign_id)
 
         context = super(CampaignProfileView, self).get_context_data(**kwargs)
-        if 'char-id' in kwargs:
-            char_id = kwargs['char-id']
+        if 'charid' in self.kwargs:
+            char_id = self.kwargs['charid']
             char = Character.objects.get(id=char_id)
             context['character'] = char
         elif self.request.user == campaign.game_master:
@@ -188,55 +244,6 @@ class MyCharactersView(ListView):
     def dispatch(self, *args, **kwargs):
         return super(MyCharactersView, self).dispatch(*args, **kwargs)
 
-
-class LocationsView(ListView):
-    model = Location
-    template_name = 'locations.html'
-    context_object_name = 'locations'
-
-    def get_context_data(self, **kwargs):
-        campaign_id = self.kwargs['pk']
-        campaign = Campaign.objects.get(id=campaign_id)
-
-        context = super(LocationsView, self).get_context_data(**kwargs)
-
-        context['campaign'] = campaign
-        return context
-
-    def get_queryset(self):
-        campaign_id = self.kwargs['pk']
-        campaign = Campaign.objects.get(id=campaign_id)
-        locations = Location.objects.filter(campaigns=campaign)
-        return locations
-
-    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
-    def dispatch(self, *args, **kwargs):
-        return super(LocationsView, self).dispatch(*args, **kwargs)
-
-
-class LoresView(ListView):
-    model = Lore
-    template_name = 'lores.html'
-    context_object_name = 'lores'
-
-    def get_context_data(self, **kwargs):
-        campaign_id = self.kwargs['pk']
-        campaign = Campaign.objects.get(id=campaign_id)
-
-        context = super(LoresView, self).get_context_data(**kwargs)
-
-        context['campaign'] = campaign
-        return context
-
-    def get_queryset(self):
-        campaign_id = self.kwargs['pk']
-        campaign = Campaign.objects.get(id=campaign_id)
-        lores = Lore.objects.filter(campaigns=campaign)
-        return lores
-
-    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
-    def dispatch(self, *args, **kwargs):
-        return super(LoresView, self).dispatch(*args, **kwargs)
 
 
 class CampaignCharactersView(ListView):
@@ -305,7 +312,13 @@ class KnownLocationsView(ListView):
     def get_queryset(self):
         char_id = self.kwargs['charid']
         char = Character.objects.get(id=char_id)
-        return char.known_locations.all
+        locations = list(Location.objects.all())
+        for location in locations:
+            for child in location.get_children:
+                if child in locations:
+                  locations.remove(child)
+
+        return locations
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
@@ -339,30 +352,55 @@ class KnownCharactersView(ListView):
 # campaign model profiles
 # todo filter knowledge
 
-class CharacterProfileView(DetailView):
-    model = Character
+class CharacterProfileView(View):
     template_name = 'character.html'
-    context_object_name = 'character'
+
+    def get(self, request, **kwargs):
+        char_id = self.kwargs['charid']
+        known_char_id = self.kwargs['knowncharid']
+        char = Character.objects.get(id=char_id)
+        known_char = Character.objects.get(id=known_char_id)
+
+        context = dict()
+        context['character'] = known_char
+
+        return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
         return super(CharacterProfileView, self).dispatch(*args, **kwargs)
 
 
-class LoreProfileView(DetailView):
+class LoreProfileView(View):
     model = Character
     template_name = 'lore.html'
-    context_object_name = 'lore'
+
+    def get(self, request, **kwargs):
+        lore_id = self.kwargs['loreid']
+        lore = Lore.objects.get(id=lore_id)
+
+        context = dict()
+        context['lore'] = lore
+
+        return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
         return super(LoreProfileView, self).dispatch(*args, **kwargs)
 
 
-class LocationProfileView(DetailView):
+class LocationProfileView(View):
     model = Location
     template_name = 'location.html'
-    context_object_name = 'location'
+
+    def get(self, request, **kwargs):
+        loc_id = self.kwargs['locationid']
+        location = Location.objects.get(id=loc_id)
+
+        context = dict()
+        context['location'] = location
+
+        return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
@@ -383,8 +421,8 @@ class NavLoader(View):
         context = dict()
 
         context['campaign'] = campaign
-        if 'char-id' in kwargs:
-            char_id = kwargs['char-id']
+        if 'charid' in self.kwargs:
+            char_id = self.kwargs['charid']
             char = Character.objects.get(id=char_id)
             context['character'] = char
         elif self.request.user == campaign.game_master:

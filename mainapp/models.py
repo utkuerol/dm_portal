@@ -12,6 +12,7 @@ class Setting(models.Model):
     def __str__(self):
         return self.name
 
+
 class Campaign(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=10000, null=False)
@@ -25,30 +26,42 @@ class Campaign(models.Model):
     def __str__(self):
         return self.name
 
+
 class Location(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=10000, null=False)
     campaign = models.ManyToManyField(Campaign)
     important_characters = models.ManyToManyField("Character", blank=True)
     parent_location = models.ForeignKey("Location", on_delete=models.CASCADE, null=True, blank=True)
-    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True)
+    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.name
 
+    @property
+    def get_children(self):
+        children = list()
+        locations = Location.objects.all()
+        for location in locations:
+            if location in list(Location.objects.filter(parent_location=self)):
+                children.append(location)
+        return children
+
+
 class Character(models.Model):
     name = models.CharField(max_length=100, null=False, unique=False)
-    image = models.ImageField(upload_to="images", null=True)
-    description = models.CharField(max_length=10000, null=False)
+    image = models.ImageField(upload_to="media", null=True, default="images/dm.jpg")
+    description = models.CharField(max_length=10000, null=False, default='The one and only')
     campaign = models.ForeignKey("Campaign", on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     known_characters = models.ManyToManyField("Character", blank=True)
     known_locations = models.ManyToManyField("Location", blank=True)
-    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, related_name="own_lore")
+    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True, related_name="own_lore")
     known_lores = models.ManyToManyField("Lore", blank=True, related_name="known_lores")
 
     def __str__(self):
         return self.name
+
 
 LORE_TYPES = (
     ("HISTORY", "History"),

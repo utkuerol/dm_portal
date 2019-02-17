@@ -1,7 +1,19 @@
 {% extends 'campaign-layout.html' %}
 
-{% block title %} Player Character {% endblock %}
+{% block title %} {{ character.name }} {% endblock %}
 
 {% block content %}
 
+    <div class="card">
+        <div class="row">
+            <img class="card-image" src="{{ character.image.url }}" style="height: 300px">
+        <div class="card-body">
+            <h5 class="card-title">{{ character.name }}</h5>
+            <p class="card-text">{{ character.description }}</p>
+            <hr>
+            <p class="card-text">{{ character.own_lore.text_level1 }}</p>
+        </div>
+        </div>
+
+    </div>
 {% endblock %}

@@ -2,17 +2,29 @@
 
 {% block title %} Lores {% endblock %}
 
-
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
 
 {% block content %}
-    <div class="card-group">
-        {% if locations %}
+    {% if campaign.game_master == user %}
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'new-lore' pk=campaign.id charid=request.resolver_match.kwargs.charid %}"><h5
+                        class="card-title">New Lore</h5></a>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card-deck" style="margin-top: 15px">
+        {% if lores %}
             {% for lore in lores %}
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">{{ lore.title }}</h5>
+                        <a href="{% url 'lore-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid loreid=lore.id %}">
+                            <h5 class="
+                           card-title">{{ lore.title }}</h5>
+                        </a>
                         <p class="card-text">Type: {{ lore.type }}</p>
-                        <p class="card-text">{{ lore.text_level1 }}</p>
                     </div>
                 </div>
             {% endfor %}

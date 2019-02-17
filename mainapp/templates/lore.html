@@ -1,0 +1,19 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} {{ lore.title }} {% endblock %}
+
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
+
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ lore.title }}</h5>
+            <p class="card-text">{{ lore.type }}</p>
+            <hr>
+            <p class="card-text">{{ lore.text_level1 }}</p>
+        </div>
+    </div>
+{% endblock %}

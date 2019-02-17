@@ -1,17 +1,31 @@
 {% extends 'campaign-layout.html' %}
 
 {% block title %} Characters {% endblock %}
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
 
 
 
 {% block content %}
-    <div class="card-group">
+    {% if campaign.game_master == user %}
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'new-character' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid %}">
+                    <h5
+                            class="card-title">New Character</h5></a>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="card-columns" style="margin-top: 15px">
         {% if characters %}
             {% for character in characters %}
                 <div class="card">
-                    <img class="card-img-top" src="{{ character.image }}" alt="Card image cap">
+                    <img class="card-img-top" src="{{ character.image.url }}">
                     <div class="card-body">
-                        <h5 class="card-title">{{ character.name }}</h5>
+                        <a href="{% url 'character-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid knowncharid=character.id %}">
+                            <h5 class="card-title">{{ character.name }}</h5>
+                        </a>
                         <p class="card-text">{{ character.description }}</p>
                         <p class="card-text">Campaign: {{ character.campaign.name }}</p>
 
@@ -21,7 +35,13 @@
         {% else %}
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">You don't have any characters!</h5>
+                    {% if campaign.game_master == user %}
+                        <h5 class="card-title">There are no characters in this campaign :(</h5>
+                    {% else %}
+                        <h5 class="card-title">You don't know any living beings. Social much?</h5>
+
+                    {% endif %}
+
                 </div>
             </div>
         {% endif %}

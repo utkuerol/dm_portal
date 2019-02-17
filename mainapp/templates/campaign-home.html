@@ -23,14 +23,17 @@
 
     {% if campaign.game_master != user %}
         {% if character %}
-            <div class="card" style="margin-top: 15px">
-                <div class="card-header">Your Character</div>
-                <img class="card-img-top" src="{{ character.image }}" alt="Card image cap">
-                <div class="card-body">
-                    <h5 class="card-title">{{ character.name }}</h5>
-                    <p class="card-text">{{ character.description }}</p>
+            <div class="card-columns">
+                <div class="card" style="margin-top: 15px">
+                    <div class="card-header">Your Character</div>
+                    <img class="card-img-top" src="{{ character.image.url }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ character.name }}</h5>
+                        <p class="card-text">{{ character.description }}</p>
+                    </div>
                 </div>
             </div>
+
         {% else %}
             <div class="card" style="margin-top: 15px">
                 <div class="card-header">Continue As:</div>
@@ -60,9 +63,10 @@
                 </div>
             </div>
             <div class="card" style="margin-top: 15px">
-                <div class="card-header">Manage Players</div>
+                <div class="card-header">Manage Campaign</div>
                 <div class="card-body">
-
+                    <h5 class="card-title"><a href="{% url 'campaign-update' pk=campaign.id %}">Edit Campaign</a></h5>
+                    <h5 class="card-title"><a href="#">Delete Campaign</a></h5>
                 </div>
             </div>
         </div>

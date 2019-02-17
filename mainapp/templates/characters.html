@@ -3,16 +3,18 @@
 {% block title %} Characters {% endblock %}
 
 {% block content %}
-    <div class="card-group">
+
+    <div class="card-columns">
         {% if characters %}
             {% for character in characters %}
                 <div class="card">
-                    <img class="card-img-top" src="{{ character.image }}" alt="Card image cap">
+                    <img class="card-img-top" src="{{ character.image.url }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ character.name }}</h5>
                         <p class="card-text">{{ character.description }}</p>
                         <p class="card-text">Campaign: {{ character.campaign.name }}</p>
-
+                        <a href="{% url 'campaign-character-profile' pk=character.campaign.id charid=character.id %}"><p class="card-text">
+                            Continue the journey!</p></a>
                     </div>
                 </div>
             {% endfor %}

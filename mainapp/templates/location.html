@@ -1,0 +1,49 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} {{ location.name }} {% endblock %}
+
+
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
+
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ location.name }}</h5>
+            <p class="card-text">{{ location.description }}</p>
+            {% if location.parent_location %}
+                <p class="card-text">Belongs to: <a
+                        href="{% url 'location-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid locationid=location.parent_location.id %}">
+                    {{ location.parent_location }}</a></p>
+            {% endif %}
+            <hr>
+            <p class="card-text">{{ location.own_lore.text_level1 }}</p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 15px">
+        <div class="card-header">Important Characters</div>
+        <div class="card-body">
+            <div class="card-columns">
+                {% if location.important_characters.all %}
+                    {% for character in location.important_characters.all %}
+                        <div class="card">
+                            <img class="card-img-top" src="{{ character.image.url }}">
+                            <div class="card-body">
+                                <a href="{% url 'character-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid knowncharid=character.id %}">
+                                    <h5 class="card-title">{{ character.name }}</h5>
+                                </a>
+                                <p class="card-text">{{ character.description }}</p>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

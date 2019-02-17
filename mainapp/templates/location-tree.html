@@ -1,0 +1,13 @@
+{% for location in locations %}
+    <li class="list-group-item">
+        <a href="{% url 'location-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid locationid=location.id %}">
+            <p>{{ location.name }}</p></a>
+            <p>{{ location.description }}</p>
+
+            {% if location.get_children|length %}
+                <ul class="list-group">
+                    {% include "location-tree.html" with locations=location.get_children %}
+                </ul>
+            {% endif %}
+    </li>
+{% endfor %}

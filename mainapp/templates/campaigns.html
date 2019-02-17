@@ -5,6 +5,15 @@
 {% block content %}
     {% if campaigns %}
         <div class="card-group">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Want some more? Start a new adventure!</h5>
+                    <form action="{% url 'new-campaign' %}" method="get">
+                        <button type="submit" class="btn btn-primary bg-dark">New Campaign</button>
+                    </form>
+
+                </div>
+            </div>
             {% for campaign in campaigns %}
                 <div class="card">
                     <div class="card-body">

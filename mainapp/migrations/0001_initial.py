@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, unique=True)),
-                ('image', models.ImageField(null=True, upload_to='images')),
+                ('image', models.ImageField(null=True, upload_to='media')),
                 ('description', models.CharField(max_length=10000)),
                 ('campaign', models.ManyToManyField(to='mainapp.Campaign')),
                 ('known_characters', models.ManyToManyField(to='mainapp.Character')),

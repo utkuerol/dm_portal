@@ -2,27 +2,24 @@
 
 {% block title %} Locations {% endblock %}
 
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
 
 
 {% block content %}
-    <div class="card-group">
-        {% if locations %}
-            {% for location in locations %}
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ location.name }}</h5>
-                        <p class="card-text">{{ location.description }}</p>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">No locations found :(</h5>
-                </div>
-            </div>
-        {% endif %}
 
-    </div>
+    {% if campaign.game_master == user %}
+        <div class="card">
+            <div class="card-body">
+                <a href="{% url 'new-location' pk=campaign.id charid=request.resolver_match.kwargs.charid %}"><h5
+                        class="card-title">New Location</h5></a>
+            </div>
+        </div>
+    {% endif %}
+
+    <ul class="list-group">
+        {% include "location-tree.html" %}
+    </ul>
+
 
 {% endblock %}

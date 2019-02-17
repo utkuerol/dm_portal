@@ -9,6 +9,11 @@
 
     {% else %}
 
+        <div class="card" style="width: 25%;">
+            <div class="card-body" >
+                <a href="{% url 'register' %}"><h5 class="card-title" style="text-align: center">Sign Up</h5></a>
+            </div>
+        </div>
     {% endif %}
 
 {% endblock %}

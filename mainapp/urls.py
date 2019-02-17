@@ -1,6 +1,6 @@
 from django.urls import path
 
-from mainapp.views import CampaignsView, CharactersView, LoresView, LocationsView, \
+from mainapp.views import CampaignsView, CharactersView, \
     CampaignCharactersView, KnownLoresView, KnownLocationsView, KnownCharactersView, CampaignProfileView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
     MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader
@@ -11,21 +11,22 @@ urlpatterns = [
     path('campaigns/new', CampaignCreateView.as_view(), name='new-campaign'),
     path('campaigns/<int:pk>/update', CampaignUpdateView.as_view(), name='campaign-update'),
     path('campaigns/<int:pk>', CampaignProfileView.as_view(), name='campaign-profile'),
+    path('campaigns/<int:pk>/<int:charid>', CampaignProfileView.as_view(), name='campaign-character-profile'),
     path('campaigns/<int:pk>/characters/', MyCharactersView.as_view(), name='my-characters'),
-    path('campaigns/<int:pk>/<int:charid>/locations/', LocationsView.as_view(), name='locations'),
-    path('campaigns/<int:pk>/<int:charid>/lores/', LoresView.as_view(), name='lores'),
     path('campaigns/<int:pk>/<int:charid>/characters/', CampaignCharactersView.as_view(), name='campaign-characters'),
     path('campaigns/<int:pk>/<int:charid>/known-locations', KnownLocationsView.as_view(), name='known-locations'),
     path('campaigns/<int:pk>/<int:charid>/known-lores/', KnownLoresView.as_view(), name='known-lores'),
     path('campaigns/<int:pk>/<int:charid>/known-characters/', KnownCharactersView.as_view(), name='known-characters'),
-    path('campaigns/<int:pk>/<int:charid>/lores/<int:lore_id>', LoreProfileView.as_view(), name='lore-profile'),
-    path('campaigns/<int:pk>/<int:charid>/locations/<int:location_id>', LocationProfileView.as_view(), name='location-profile'),
-    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>', CharacterProfileView.as_view(), name='character-profile'),
+    path('campaigns/<int:pk>/<int:charid>/lores/<int:loreid>', LoreProfileView.as_view(), name='lore-profile'),
+    path('campaigns/<int:pk>/<int:charid>/locations/<int:locationid>', LocationProfileView.as_view(),
+         name='location-profile'),
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>', CharacterProfileView.as_view(),
+         name='character-profile'),
 
     path('campaigns/<int:pk>/<int:charid>/characters/new', CharacterCreateView.as_view(), name='new-character'),
     path('campaigns/<int:pk>/<int:charid>/locations/new', LocationCreateView.as_view(), name='new-location'),
     path('campaigns/<int:pk>/<int:charid>/lore/new', LoreCreateView.as_view(), name='new-lore'),
 
-    path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav')
+    path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav'),
+    path('campaigns/<int:pk>/<int:charid>/loadnav', NavLoader.as_view(), name='loadnav-with-char')
 ]
-
