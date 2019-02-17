@@ -84,8 +84,7 @@ class CharacterCreateView(CreateView):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
-        gm = campaign.game_master
-        gm_char = Character.objects.get(user=gm)
+        gm_char = Character.objects.get(campaign=campaign, name='Game Master')
 
         all_chars = list(Character.objects.filter(campaign=campaign))
         all_locations = list(Location.objects.filter(campaign=campaign))
@@ -116,8 +115,7 @@ class LocationCreateView(CreateView):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
-        gm = campaign.game_master
-        gm_char = Character.objects.get(user=gm)
+        gm_char = Character.objects.get(campaign=campaign, name='Game Master')
 
         all_chars = list(Character.objects.filter(campaign=campaign))
         all_locations = list(Location.objects.filter(campaign=campaign))
@@ -245,7 +243,6 @@ class MyCharactersView(ListView):
         return super(MyCharactersView, self).dispatch(*args, **kwargs)
 
 
-
 class CampaignCharactersView(ListView):
     model = Character
     template_name = 'campaign-characters.html'
@@ -310,13 +307,7 @@ class KnownLocationsView(ListView):
         return context
 
     def get_queryset(self):
-        char_id = self.kwargs['charid']
-        char = Character.objects.get(id=char_id)
-        locations = list(Location.objects.all())
-        for location in locations:
-            for child in location.get_children:
-                if child in locations:
-                  locations.remove(child)
+        locations = list(Location.objects.filter(parent_location__isnull=True))
 
         return locations
 
