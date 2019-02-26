@@ -3,7 +3,8 @@ from django.urls import path
 from mainapp.views import CampaignsView, CharactersView, \
     CampaignCharactersView, KnownLoresView, KnownLocationsView, KnownCharactersView, CampaignProfileView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
-    MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader
+    MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader, KnownCharacterRemoveView, \
+    KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView
 
 urlpatterns = [
     path('campaigns/', CampaignsView.as_view(), name='campaigns'),
@@ -22,7 +23,18 @@ urlpatterns = [
          name='location-profile'),
     path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>', CharacterProfileView.as_view(),
          name='character-profile'),
-
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/removeknownchar/<int:toremovecharid>',
+         KnownCharacterRemoveView.as_view(),
+         name='known-character-remove'),
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/addknownchar/<int:toaddcharid>',
+         KnownCharacterAddView.as_view(),
+         name='add-known-char'),
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/removeknownlore/<int:toremoveloreid>',
+         KnownLoreRemoveView.as_view(),
+         name='known-lore-remove'),
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/addknownlore/<int:toaddloreid>',
+         KnownLoreAddView.as_view(),
+         name='add-known-lore'),
     path('campaigns/<int:pk>/<int:charid>/characters/new', CharacterCreateView.as_view(), name='new-character'),
     path('campaigns/<int:pk>/<int:charid>/locations/new', LocationCreateView.as_view(), name='new-location'),
     path('campaigns/<int:pk>/<int:charid>/lore/new', LoreCreateView.as_view(), name='new-lore'),

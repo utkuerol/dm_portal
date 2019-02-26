@@ -340,6 +340,64 @@ class KnownCharactersView(ListView):
         return super(KnownCharactersView, self).dispatch(*args, **kwargs)
 
 
+class KnownCharacterRemoveView(View):
+
+    def post(self, request, **kwargs):
+        current_char_id = self.kwargs['knowncharid']
+        to_remove_char_id = self.kwargs['toremovecharid']
+
+        current_char = Character.objects.get(id=current_char_id)
+        current_char.known_characters.remove(Character.objects.get(id=to_remove_char_id))
+        current_char.save()
+
+        return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
+                        knowncharid=self.kwargs['knowncharid'])
+
+class KnownLoreRemoveView(View):
+
+    def post(self, request, **kwargs):
+        current_char_id = self.kwargs['knowncharid']
+        to_remove_lore_id = self.kwargs['toremoveloreid']
+
+        current_char = Character.objects.get(id=current_char_id)
+        current_char.known_lores.remove(Lore.objects.get(id=to_remove_lore_id))
+        current_char.save()
+
+        return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
+                        knowncharid=self.kwargs['knowncharid'])
+
+
+class KnownCharacterAddView(View):
+
+
+    def post(self, request, **kwargs):
+        current_char_id = self.kwargs['knowncharid']
+        to_add_char_id = self.kwargs['toaddcharid']
+
+        current_char = Character.objects.get(id=current_char_id)
+        current_char.known_characters.add(Character.objects.get(id=to_add_char_id))
+        current_char.save()
+
+        return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
+                        knowncharid=self.kwargs['knowncharid'])
+
+
+class KnownLoreAddView(View):
+
+
+
+    def post(self, request, **kwargs):
+        current_char_id = self.kwargs['knowncharid']
+        to_add_lore_id = self.kwargs['toaddloreid']
+
+        current_char = Character.objects.get(id=current_char_id)
+        current_char.known_lores.add(Lore.objects.get(id=to_add_lore_id))
+        current_char.save()
+
+        return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
+                        knowncharid=self.kwargs['knowncharid'])
+
+
 # campaign model profiles
 # todo filter knowledge
 
@@ -354,7 +412,7 @@ class CharacterProfileView(View):
 
         context = dict()
         context['character'] = known_char
-
+        context['current_char'] = char
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
