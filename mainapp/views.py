@@ -442,7 +442,11 @@ class CharacterProfileView(View):
         char = Character.objects.get(id=char_id)
         known_char = Character.objects.get(id=known_char_id)
 
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
         context = dict()
+        context['campaign'] = campaign
         context['character'] = known_char
         context['current_char'] = char
         return render(request, self.template_name, context)
@@ -464,7 +468,11 @@ class LoreProfileView(View):
         lore_id = self.kwargs['loreid']
         lore = Lore.objects.get(id=lore_id)
 
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
         context = dict()
+        context['campaign'] = campaign
         context['lore'] = lore
 
         if 'charid' in self.kwargs:
@@ -484,7 +492,11 @@ class LocationProfileView(View):
         loc_id = self.kwargs['locationid']
         location = Location.objects.get(id=loc_id)
 
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
         context = dict()
+        context['campaign'] = campaign
         context['location'] = location
 
         return render(request, self.template_name, context)
@@ -506,8 +518,8 @@ class NavLoader(View):
         campaign = Campaign.objects.get(id=campaign_id)
 
         context = dict()
-
         context['campaign'] = campaign
+
         if 'charid' in self.kwargs:
             char_id = self.kwargs['charid']
             char = Character.objects.get(id=char_id)

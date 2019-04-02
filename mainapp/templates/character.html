@@ -1,6 +1,8 @@
 {% extends 'campaign-layout.html' %}
 
 {% block title %} {{ character.name }} {% endblock %}
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
 
 {% block content %}
 
