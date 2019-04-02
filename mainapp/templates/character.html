@@ -87,7 +87,25 @@
                             </a>
                             <button type="submit" class="btn btn-primary bg-dark" style="margin-left: 30px">remove
                             </button>
+
+                            <div class="dropdown" style="margin-left: 30px">
+                                <a data-toggle="dropdown" class="dropdown-toggle">Change
+                                    Lore Level
+                                    <b class="caret"></b></a>
+                                <ul class="dropdown-menu" id="levelSelect">
+                                    <li onclick="updateLevel(1, {{ character.id }}, {{ knownlore.id }})"><a href="#">1</a>
+                                    </li>
+                                    <li onclick="updateLevel(2, {{ character.id }}, {{ knownlore.id }})"><a href="#">2</a>
+                                    </li>
+                                    <li onclick="updateLevel(3, {{ character.id }}, {{ knownlore.id }})"><a href="#">3</a>
+                                    </li>
+                                    <li onclick="updateLevel(4, {{ character.id }}, {{ knownlore.id }})"><a href="#">4</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </form>
+
+
 
                     {% endfor %}
                 </div>
@@ -172,6 +190,13 @@
 
         function myFunction2() {
             document.getElementById("myDropdown2").classList.toggle("show");
+        }
+
+        function updateLevel(level, charid, loreid) {
+            $.ajax({
+                type: "POST",
+                url: "/update-knownlore-level/" + level + "/" + charid + "/" + loreid
+            });
         }
 
     </script>

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -8,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from django.views.generic.base import View
 
-from mainapp.models import Character, Campaign, Location, Lore
+from mainapp.models import Character, Campaign, Location, Lore, KnownLoreCharacter
 
 
 # home
@@ -80,7 +81,11 @@ class CharacterCreateView(CreateView):
     fields = '__all__'
 
     def form_valid(self, form):
-        form.save()
+        char = form.save(commit=False)
+        char.save()
+        for lore in list(Lore.objects.filter(campaign__character=char)):
+            KnownLoreCharacter.objects.create(character=char, lore=lore, level=1)
+
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
@@ -90,7 +95,11 @@ class CharacterCreateView(CreateView):
         all_locations = list(Location.objects.filter(campaign=campaign))
         all_lores = list(Lore.objects.filter(campaign=campaign))
         gm_char.known_characters.add(*all_chars)
-        gm_char.known_lores.add(*all_lores)
+
+        for lore in all_lores:
+            if not KnownLoreCharacter.objects.filter(character=gm_char, lore=lore).exists():
+                KnownLoreCharacter.objects.create(character=gm_char, lore=lore, level=4)
+
         gm_char.known_locations.add(*all_locations)
 
         return redirect('known-characters', pk=self.kwargs['pk'], charid=self.kwargs['charid'])
@@ -122,7 +131,11 @@ class LocationCreateView(CreateView):
         all_lores = list(Lore.objects.filter(campaign=campaign))
 
         gm_char.known_characters.add(*all_chars)
-        gm_char.known_lores.add(*all_lores)
+
+        for lore in all_lores:
+            if not KnownLoreCharacter.objects.filter(character=gm_char, lore=lore).exists():
+                KnownLoreCharacter.objects.create(character=gm_char, lore=lore, level=4)
+
         gm_char.known_locations.add(*all_locations)
         gm_char.save()
 
@@ -156,7 +169,11 @@ class LoreCreateView(CreateView):
         all_lores = list(Lore.objects.filter(campaign=campaign))
 
         gm_char.known_characters.set(*all_chars)
-        gm_char.known_lores.set(*all_lores)
+
+        for lore in all_lores:
+            if not KnownLoreCharacter.objects.filter(character=gm_char, lore=lore).exists():
+                KnownLoreCharacter.objects.create(character=gm_char, lore=lore, level=4)
+
         gm_char.known_locations.set(*all_locations)
         gm_char.save()
 
@@ -384,19 +401,34 @@ class KnownCharacterAddView(View):
 
 class KnownLoreAddView(View):
 
-
-
     def post(self, request, **kwargs):
         current_char_id = self.kwargs['knowncharid']
         to_add_lore_id = self.kwargs['toaddloreid']
 
         current_char = Character.objects.get(id=current_char_id)
-        current_char.known_lores.add(Lore.objects.get(id=to_add_lore_id))
-        current_char.save()
+        KnownLoreCharacter.objects.create(character=current_char, lore=Lore.objects.get(id=to_add_lore_id))
 
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
 
+
+class UpdateKnownLoreLevelView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(UpdateKnownLoreLevelView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, **kwargs):
+        level = self.kwargs['level']
+        charid = self.kwargs['charid']
+        loreid = self.kwargs['loreid']
+
+        knownlore = KnownLoreCharacter.objects.get(character=charid, lore=loreid)
+        knownlore.level = level
+        knownlore.save()
+
+        messages.success(request, 'Lore level updated for the character')
+        return JsonResponse({'success':True})
 
 # campaign model profiles
 # todo filter knowledge
@@ -424,6 +456,10 @@ class LoreProfileView(View):
     model = Character
     template_name = 'lore.html'
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(LoreProfileView, self).dispatch(*args, **kwargs)
+
     def get(self, request, **kwargs):
         lore_id = self.kwargs['loreid']
         lore = Lore.objects.get(id=lore_id)
@@ -431,11 +467,13 @@ class LoreProfileView(View):
         context = dict()
         context['lore'] = lore
 
-        return render(request, self.template_name, context)
+        if 'charid' in self.kwargs:
+            char_id = self.kwargs['charid']
+            char = Character.objects.get(id=char_id)
+            knownlore = KnownLoreCharacter.objects.get(character=char, lore=lore)
+            context['knownlore'] = lore.text_of_level(knownlore.level)
 
-    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
-    def dispatch(self, *args, **kwargs):
-        return super(LoreProfileView, self).dispatch(*args, **kwargs)
+        return render(request, self.template_name, context)
 
 
 class LocationProfileView(View):

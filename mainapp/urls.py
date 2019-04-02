@@ -4,7 +4,7 @@ from mainapp.views import CampaignsView, CharactersView, \
     CampaignCharactersView, KnownLoresView, KnownLocationsView, KnownCharactersView, CampaignProfileView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
     MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader, KnownCharacterRemoveView, \
-    KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView
+    KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView, UpdateKnownLoreLevelView
 
 urlpatterns = [
     path('campaigns/', CampaignsView.as_view(), name='campaigns'),
@@ -39,6 +39,9 @@ urlpatterns = [
     path('campaigns/<int:pk>/<int:charid>/locations/new', LocationCreateView.as_view(), name='new-location'),
     path('campaigns/<int:pk>/<int:charid>/lore/new', LoreCreateView.as_view(), name='new-lore'),
 
+
     path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav'),
-    path('campaigns/<int:pk>/<int:charid>/loadnav', NavLoader.as_view(), name='loadnav-with-char')
+    path('campaigns/<int:pk>/<int:charid>/loadnav', NavLoader.as_view(), name='loadnav-with-char'),
+
+    path('update-knownlore-level/<int:level>/<int:charid>/<int:loreid>', UpdateKnownLoreLevelView.as_view(), name='update-knownlore-level'),
 ]

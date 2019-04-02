@@ -1,5 +1,6 @@
 import self as self
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 
@@ -57,7 +58,7 @@ class Character(models.Model):
     known_characters = models.ManyToManyField("Character", blank=True)
     known_locations = models.ManyToManyField("Location", blank=True)
     own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True, related_name="own_lore")
-    known_lores = models.ManyToManyField("Lore", blank=True, related_name="known_lores")
+    known_lores = models.ManyToManyField("Lore", blank=True, related_name="known_lores", through="KnownLoreCharacter")
 
     def __str__(self):
         return self.name
@@ -82,3 +83,21 @@ class Lore(models.Model):
 
     def __str__(self):
         return self.title
+
+    def text_of_level(self, level):
+        if level == 1:
+            return self.text_level1
+        elif level == 2:
+            return self.text_level2
+        elif level == 3:
+            return self.text_level3
+        elif level == 4:
+            return self.text_level4
+        else:
+            return "Something doesn't seem right on the server :("
+
+class KnownLoreCharacter(models.Model):
+    character = models.ForeignKey("Character", on_delete=models.CASCADE)
+    lore = models.ForeignKey("Lore", on_delete=models.CASCADE)
+    level = models.IntegerField(default=1,
+                                null=False, unique=False)
