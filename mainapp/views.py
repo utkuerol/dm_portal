@@ -57,16 +57,28 @@ class CampaignCreateView(CreateView):
         id = self.object.id
         campaign = Campaign.objects.get(id=id)
         user = campaign.game_master
-        all_chars = list(Character.objects.filter(campaign=campaign))
-        all_locations = list(Location.objects.filter(campaign=campaign))
-        all_lores = list(Lore.objects.filter(campaign=campaign))
 
         gm_char = Character(name='Game Master', campaign=campaign, user=user)
         gm_char.save()
 
-        gm_char.known_characters.set(*all_chars)
-        gm_char.known_lores.set(*all_lores)
-        gm_char.known_locations.set(*all_locations)
+        all_chars = list(Character.objects.filter(campaign=campaign))
+        all_locations = list(Location.objects.filter(campaign=campaign))
+        all_lores = list(Lore.objects.filter(campaign=campaign))
+
+        try:
+            gm_char.known_characters.set(*all_chars)
+        except Exception:
+            pass
+
+        for lore in all_lores:
+            if not KnownLoreCharacter.objects.filter(character=gm_char, lore=lore).exists():
+                KnownLoreCharacter.objects.create(character=gm_char, lore=lore, level=4)
+
+        try:
+            gm_char.known_locations.set(*all_locations)
+        except Exception:
+            pass
+
         gm_char.save()
 
         campaign.players.add(user)
@@ -85,6 +97,9 @@ class CharacterCreateView(CreateView):
         char.save()
         for lore in list(Lore.objects.filter(campaign__character=char)):
             KnownLoreCharacter.objects.create(character=char, lore=lore, level=1)
+
+        if char.own_lore:
+            KnownLoreCharacter.objects.create(character=char, lore=char.own_lore, level=4)
 
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
@@ -168,13 +183,13 @@ class LoreCreateView(CreateView):
         all_locations = list(Location.objects.filter(campaign=campaign))
         all_lores = list(Lore.objects.filter(campaign=campaign))
 
-        gm_char.known_characters.set(*all_chars)
+        gm_char.known_characters.add(*all_chars)
 
         for lore in all_lores:
             if not KnownLoreCharacter.objects.filter(character=gm_char, lore=lore).exists():
                 KnownLoreCharacter.objects.create(character=gm_char, lore=lore, level=4)
 
-        gm_char.known_locations.set(*all_locations)
+        gm_char.known_locations.add(*all_locations)
         gm_char.save()
 
         return redirect('known-lores', pk=self.kwargs['pk'], charid=self.kwargs['charid'])
@@ -446,8 +461,8 @@ class CharacterProfileView(View):
 
         knownlores = KnownLoreCharacter.objects.filter(character=known_char_id)
         try:
-            own_lore_knownlore = KnownLoreCharacter.objects.get(character=char_id, lore=char.own_lore.id)
-        except KnownLoreCharacter.DoesNotExist:
+            own_lore_knownlore = KnownLoreCharacter.objects.get(character=char_id, lore=known_char.own_lore.id)
+        except Exception:
             own_lore_knownlore = None
 
         if own_lore_knownlore:
@@ -481,14 +496,19 @@ class CharacterUpdateView(UpdateView):
         return context
 
     def get_object(self, queryset=None):
-        char_id = self.kwargs['charid']
+        char_id = self.kwargs['knowncharid']
         character = Character.objects.get(id=char_id)
-        if character.name == "Game Master":
-            return character
+        return character
 
     def get_success_url(self):
         return reverse('character-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
                                                   self.kwargs['knowncharid']])
+
+    def form_valid(self, form):
+        char = form.save()
+        if char.own_lore:
+            KnownLoreCharacter.objects.create(character=char, lore=char.own_lore, level=4)
+        return super().form_valid(form)
 
 
 class LoreProfileView(View):
@@ -561,7 +581,7 @@ class LocationProfileView(View):
 
         try:
             own_lore_knownlore = KnownLoreCharacter.objects.get(character=char_id, lore=location.own_lore.id)
-        except KnownLoreCharacter.DoesNotExist:
+        except Exception:
             own_lore_knownlore = None
 
         if own_lore_knownlore:
