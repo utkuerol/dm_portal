@@ -64,6 +64,7 @@ class Character(models.Model):
         return self.name
 
 
+
 LORE_TYPES = (
     ("HISTORY", "History"),
     ("ARCANE", "Arcane"),

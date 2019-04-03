@@ -4,7 +4,8 @@ from mainapp.views import CampaignsView, CharactersView, \
     CampaignCharactersView, KnownLoresView, KnownLocationsView, KnownCharactersView, CampaignProfileView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
     MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader, KnownCharacterRemoveView, \
-    KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView, UpdateKnownLoreLevelView
+    KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView, UpdateKnownLoreLevelView, CharacterUpdateView, \
+    LocationUpdateView, LoreUpdateView
 
 urlpatterns = [
     path('campaigns/', CampaignsView.as_view(), name='campaigns'),
@@ -19,10 +20,15 @@ urlpatterns = [
     path('campaigns/<int:pk>/<int:charid>/known-lores/', KnownLoresView.as_view(), name='known-lores'),
     path('campaigns/<int:pk>/<int:charid>/known-characters/', KnownCharactersView.as_view(), name='known-characters'),
     path('campaigns/<int:pk>/<int:charid>/lores/<int:loreid>', LoreProfileView.as_view(), name='lore-profile'),
+    path('campaigns/<int:pk>/<int:charid>/lores/<int:loreid>/update', LoreUpdateView.as_view(), name='lore-update'),
     path('campaigns/<int:pk>/<int:charid>/locations/<int:locationid>', LocationProfileView.as_view(),
          name='location-profile'),
+    path('campaigns/<int:pk>/<int:charid>/locations/<int:locationid>/update', LocationUpdateView.as_view(),
+         name='location-update'),
     path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>', CharacterProfileView.as_view(),
          name='character-profile'),
+    path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/update', CharacterUpdateView.as_view(),
+         name='character-update'),
     path('campaigns/<int:pk>/<int:charid>/characters/<int:knowncharid>/removeknownchar/<int:toremovecharid>',
          KnownCharacterRemoveView.as_view(),
          name='known-character-remove'),
@@ -39,9 +45,9 @@ urlpatterns = [
     path('campaigns/<int:pk>/<int:charid>/locations/new', LocationCreateView.as_view(), name='new-location'),
     path('campaigns/<int:pk>/<int:charid>/lore/new', LoreCreateView.as_view(), name='new-lore'),
 
-
     path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav'),
     path('campaigns/<int:pk>/<int:charid>/loadnav', NavLoader.as_view(), name='loadnav-with-char'),
 
-    path('update-knownlore-level/<int:level>/<int:knownloreid>', UpdateKnownLoreLevelView.as_view(), name='update-knownlore-level'),
+    path('update-knownlore-level/<int:level>/<int:knownloreid>', UpdateKnownLoreLevelView.as_view(),
+         name='update-knownlore-level'),
 ]

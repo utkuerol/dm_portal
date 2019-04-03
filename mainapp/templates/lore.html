@@ -8,11 +8,16 @@
 {% block content %}
 
     <div class="card">
-        <div class="card-body">
+        <div class="card-body" style="position: relative">
             <h5 class="card-title">{{ lore.title }}</h5>
             <p class="card-text">{{ lore.type }}</p>
             <hr>
             <p class="card-text">{{ knownlore }}</p>
+            {% if character.campaign.game_master == user %}
+                <a href="{% url 'lore-update' pk=request.resolver_match.kwargs.pk charid=character.id loreid=lore.id %}"
+                   class="card-link"
+                   style="position: absolute; padding-right: 30px; padding-bottom: 15px; bottom:5px; right: 5px">Edit</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

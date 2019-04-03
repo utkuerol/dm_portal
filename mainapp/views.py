@@ -370,6 +370,7 @@ class KnownCharacterRemoveView(View):
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
 
+
 class KnownLoreRemoveView(View):
 
     def post(self, request, **kwargs):
@@ -385,7 +386,6 @@ class KnownLoreRemoveView(View):
 
 
 class KnownCharacterAddView(View):
-
 
     def post(self, request, **kwargs):
         current_char_id = self.kwargs['knowncharid']
@@ -427,7 +427,8 @@ class UpdateKnownLoreLevelView(View):
         knownlore.save()
 
         messages.success(request, 'Lore level updated for the character')
-        return JsonResponse({'success':True})
+        return JsonResponse({'success': True})
+
 
 # campaign model profiles
 
@@ -444,17 +445,50 @@ class CharacterProfileView(View):
         campaign = Campaign.objects.get(id=campaign_id)
 
         knownlores = KnownLoreCharacter.objects.filter(character=known_char_id)
+        try:
+            own_lore_knownlore = KnownLoreCharacter.objects.get(character=char_id, lore=char.own_lore.id)
+        except KnownLoreCharacter.DoesNotExist:
+            own_lore_knownlore = None
+
+        if own_lore_knownlore:
+            own_lore_knownlore_text = own_lore_knownlore.lore.text_of_level(own_lore_knownlore.level)
+        else:
+            own_lore_knownlore_text = "The old librarian comes back to tell you that he couldn't find anything useful on this character"
 
         context = dict()
         context['campaign'] = campaign
         context['character'] = known_char
         context['current_char'] = char
         context['knownlores'] = knownlores
+        context['own_lore_knownlore'] = own_lore_knownlore_text
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
         return super(CharacterProfileView, self).dispatch(*args, **kwargs)
+
+
+class CharacterUpdateView(UpdateView):
+    template_name = 'character-update.html'
+    model = Character
+    fields = ['name', 'image', 'description', 'user', 'own_lore']
+
+    def get_context_data(self, **kwargs):
+        context = super(CharacterUpdateView, self).get_context_data(**kwargs)
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context['campaign'] = campaign
+        return context
+
+    def get_object(self, queryset=None):
+        char_id = self.kwargs['charid']
+        character = Character.objects.get(id=char_id)
+        if character.name == "Game Master":
+            return character
+
+    def get_success_url(self):
+        return reverse('character-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
+                                                  self.kwargs['knowncharid']])
 
 
 class LoreProfileView(View):
@@ -472,9 +506,13 @@ class LoreProfileView(View):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
+        char_id = self.kwargs['charid']
+        char = Character.objects.get(id=char_id)
+
         context = dict()
         context['campaign'] = campaign
         context['lore'] = lore
+        context['character'] = char
 
         if 'charid' in self.kwargs:
             char_id = self.kwargs['charid']
@@ -483,6 +521,28 @@ class LoreProfileView(View):
             context['knownlore'] = lore.text_of_level(knownlore.level)
 
         return render(request, self.template_name, context)
+
+
+class LoreUpdateView(UpdateView):
+    template_name = 'lore-update.html'
+    model = Lore
+    fields = ['type', 'title', 'text_level1', 'text_level2', 'text_level3', 'text_level4']
+
+    def get_context_data(self, **kwargs):
+        context = super(LoreUpdateView, self).get_context_data(**kwargs)
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context['campaign'] = campaign
+        return context
+
+    def get_object(self, queryset=None):
+        lore_id = self.kwargs['loreid']
+        lore = Lore.objects.get(id=lore_id)
+        return lore
+
+    def get_success_url(self):
+        return reverse('lore-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
+                                             self.kwargs['loreid']])
 
 
 class LocationProfileView(View):
@@ -496,15 +556,51 @@ class LocationProfileView(View):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
+        char_id = self.kwargs['charid']
+        char = Character.objects.get(id=char_id)
+
+        try:
+            own_lore_knownlore = KnownLoreCharacter.objects.get(character=char_id, lore=location.own_lore.id)
+        except KnownLoreCharacter.DoesNotExist:
+            own_lore_knownlore = None
+
+        if own_lore_knownlore:
+            own_lore_knownlore_text = own_lore_knownlore.lore.text_of_level(own_lore_knownlore.level)
+        else:
+            own_lore_knownlore_text = "The old librarian comes back to tell you that he couldn't find anything useful on this place"
+
         context = dict()
         context['campaign'] = campaign
         context['location'] = location
-
+        context['character'] = char
+        context['own_lore_knownlore'] = own_lore_knownlore_text
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
         return super(LocationProfileView, self).dispatch(*args, **kwargs)
+
+
+class LocationUpdateView(UpdateView):
+    template_name = 'location-update.html'
+    model = Location
+    fields = ['name', 'parent_location', 'description', 'important_characters', 'own_lore']
+
+    def get_context_data(self, **kwargs):
+        context = super(LocationUpdateView, self).get_context_data(**kwargs)
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context['campaign'] = campaign
+        return context
+
+    def get_object(self, queryset=None):
+        location_id = self.kwargs['locationid']
+        location = Location.objects.get(id=location_id)
+        return location
+
+    def get_success_url(self):
+        return reverse('location-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
+                                                 self.kwargs['locationid']])
 
 
 class NavLoader(View):
