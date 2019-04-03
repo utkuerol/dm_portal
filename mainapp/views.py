@@ -420,10 +420,9 @@ class UpdateKnownLoreLevelView(View):
 
     def post(self, request, **kwargs):
         level = self.kwargs['level']
-        charid = self.kwargs['charid']
-        loreid = self.kwargs['loreid']
+        knownloreid = self.kwargs['knownloreid']
 
-        knownlore = KnownLoreCharacter.objects.get(character=charid, lore=loreid)
+        knownlore = KnownLoreCharacter.objects.get(id=knownloreid)
         knownlore.level = level
         knownlore.save()
 
@@ -431,7 +430,6 @@ class UpdateKnownLoreLevelView(View):
         return JsonResponse({'success':True})
 
 # campaign model profiles
-# todo filter knowledge
 
 class CharacterProfileView(View):
     template_name = 'character.html'
@@ -445,10 +443,13 @@ class CharacterProfileView(View):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
 
+        knownlores = KnownLoreCharacter.objects.filter(character=known_char_id)
+
         context = dict()
         context['campaign'] = campaign
         context['character'] = known_char
         context['current_char'] = char
+        context['knownlores'] = knownlores
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))

@@ -78,30 +78,30 @@
                     </div>
 
                     </button>
-                    {% for knownlore in character.known_lores.all %}
+                    {% for knownlore in knownlores %}
                         <form class="form-inline"
-                              action="{% url 'known-lore-remove' pk=request.resolver_match.kwargs.pk charid=current_char.id knowncharid=character.id toremoveloreid=knownlore.id %}"
+                              action="{% url 'known-lore-remove' pk=request.resolver_match.kwargs.pk charid=current_char.id knowncharid=character.id toremoveloreid=knownlore.lore.id %}"
                               method="post">
                             {% csrf_token %}
 
-                            <a href="{% url 'lore-profile' pk=request.resolver_match.kwargs.pk charid=current_char.id loreid=knownlore.id %}">
-                                <h5 class="card-title">{{ knownlore.title }}</h5>
+                            <a href="{% url 'lore-profile' pk=request.resolver_match.kwargs.pk charid=current_char.id loreid=knownlore.lore.id %}">
+                                <h5 class="card-title">{{ knownlore.lore.title }}</h5>
                             </a>
                             <button type="submit" class="btn btn-primary bg-dark" style="margin-left: 30px">remove
                             </button>
 
                             <div class="dropdown" style="margin-left: 30px">
                                 <a data-toggle="dropdown" class="dropdown-toggle">Change
-                                    Lore Level
+                                    Lore Level (Currently {{ knownlore.level }})
                                     <b class="caret"></b></a>
                                 <ul class="dropdown-menu" id="levelSelect">
-                                    <li onclick="updateLevel(1, {{ character.id }}, {{ knownlore.id }})"><a href="#">1</a>
+                                    <li onclick="updateLevel(1, {{ knownlore.id }})"><a href="javascript:history.go(0)">1</a>
                                     </li>
-                                    <li onclick="updateLevel(2, {{ character.id }}, {{ knownlore.id }})"><a href="#">2</a>
+                                    <li onclick="updateLevel(2, {{ knownlore.id }})"><a href="javascript:history.go(0)">2</a>
                                     </li>
-                                    <li onclick="updateLevel(3, {{ character.id }}, {{ knownlore.id }})"><a href="#">3</a>
+                                    <li onclick="updateLevel(3, {{ knownlore.id }})"><a href="javascript:history.go(0)">3</a>
                                     </li>
-                                    <li onclick="updateLevel(4, {{ character.id }}, {{ knownlore.id }})"><a href="#">4</a>
+                                    <li onclick="updateLevel(4, {{ knownlore.id }})"><a href="javascript:history.go(0)">4</a>
                                     </li>
                                 </ul>
                             </div>
@@ -194,10 +194,10 @@
             document.getElementById("myDropdown2").classList.toggle("show");
         }
 
-        function updateLevel(level, charid, loreid) {
+        function updateLevel(level, knownloreid) {
             $.ajax({
                 type: "POST",
-                url: "/update-knownlore-level/" + level + "/" + charid + "/" + loreid
+                url: "/update-knownlore-level/" + level + "/" + knownloreid
             });
         }
 

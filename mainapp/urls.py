@@ -43,5 +43,5 @@ urlpatterns = [
     path('campaigns/<int:pk>/loadnav', NavLoader.as_view(), name='loadnav'),
     path('campaigns/<int:pk>/<int:charid>/loadnav', NavLoader.as_view(), name='loadnav-with-char'),
 
-    path('update-knownlore-level/<int:level>/<int:charid>/<int:loreid>', UpdateKnownLoreLevelView.as_view(), name='update-knownlore-level'),
+    path('update-knownlore-level/<int:level>/<int:knownloreid>', UpdateKnownLoreLevelView.as_view(), name='update-knownlore-level'),
 ]
