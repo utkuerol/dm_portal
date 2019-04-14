@@ -17,12 +17,15 @@
                     {{ location.parent_location }}</a></p>
             {% endif %}
             <hr>
-            <p class="card-text">{{ own_lore_knownlore }}</p>
-            {% if character.campaign.game_master == user %}
-                <a href="{% url 'location-update' pk=request.resolver_match.kwargs.pk charid=character.id locationid=location.id %}"
-                   class="card-link"
-                   style="position: absolute; padding-right: 30px; padding-bottom: 15px; bottom:5px; right: 5px">Edit</a>
-            {% endif %}
+            {% for loretext in own_lore_knownlore %}
+                <b><p class="card-text">Level: {{ forloop.counter }}</p></b>
+                <p class="card-text">{{ loretext }}</p>
+                {% if character.campaign.game_master == user %}
+                    <a href="{% url 'location-update' pk=request.resolver_match.kwargs.pk charid=character.id locationid=location.id %}"
+                       class="card-link"
+                       style="position: absolute; padding-right: 30px; padding-bottom: 15px; bottom:5px; right: 5px">Edit</a>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 
