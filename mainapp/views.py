@@ -467,17 +467,19 @@ class CharacterProfileView(View):
         except Exception:
             own_lore_knownlore = None
 
+        knownlorelevels = list()
         if own_lore_knownlore:
-            own_lore_knownlore_text = own_lore_knownlore.lore.text_of_level(own_lore_knownlore.level)
+            for i in range(1, own_lore_knownlore.level + 1):
+                knownlorelevels.append(own_lore_knownlore.lore.text_of_level(i))
         else:
-            own_lore_knownlore_text = "The old librarian comes back to tell you that he couldn't find anything useful on this character"
+            knownlorelevels.append("The old librarian comes back to tell you that he couldn't find anything useful on this character")
 
         context = dict()
         context['campaign'] = campaign
         context['character'] = known_char
         context['current_char'] = char
         context['knownlores'] = knownlores
-        context['own_lore_knownlore'] = own_lore_knownlore_text
+        context['own_lore_knownlore'] = knownlorelevels
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
@@ -590,16 +592,19 @@ class LocationProfileView(View):
         except Exception:
             own_lore_knownlore = None
 
+        knownlorelevels = list()
+
         if own_lore_knownlore:
-            own_lore_knownlore_text = own_lore_knownlore.lore.text_of_level(own_lore_knownlore.level)
+            for i in range(1, own_lore_knownlore.level + 1):
+                knownlorelevels.append(own_lore_knownlore.lore.text_of_level(i))
         else:
-            own_lore_knownlore_text = "The old librarian comes back to tell you that he couldn't find anything useful on this place"
+            knownlorelevels.append("The old librarian comes back to tell you that he couldn't find anything useful on this character")
 
         context = dict()
         context['campaign'] = campaign
         context['location'] = location
         context['character'] = char
-        context['own_lore_knownlore'] = own_lore_knownlore_text
+        context['own_lore_knownlore'] = knownlorelevels
         return render(request, self.template_name, context)
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
