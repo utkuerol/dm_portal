@@ -51,7 +51,7 @@ class Location(models.Model):
 
 class Character(models.Model):
     name = models.CharField(max_length=100, null=False, unique=False)
-    image = models.ImageField(upload_to="media", null=True, default="images/dm.jpg")
+    image = models.ImageField(upload_to="media", null=True, default="media/dm.jpg")
     description = models.CharField(max_length=10000, null=False, default='The one and only')
     campaign = models.ForeignKey("Campaign", on_delete=models.CASCADE, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
