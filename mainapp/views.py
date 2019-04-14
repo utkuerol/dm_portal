@@ -339,7 +339,9 @@ class KnownLocationsView(ListView):
         return context
 
     def get_queryset(self):
-        locations = list(Location.objects.filter(parent_location__isnull=True))
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        locations = list(Location.objects.filter(parent_location__isnull=True, campaign=campaign))
 
         return locations
 
