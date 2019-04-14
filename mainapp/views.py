@@ -540,7 +540,11 @@ class LoreProfileView(View):
             char_id = self.kwargs['charid']
             char = Character.objects.get(id=char_id)
             knownlore = KnownLoreCharacter.objects.get(character=char, lore=lore)
-            context['knownlore'] = lore.text_of_level(knownlore.level)
+            knownlorelevels = list()
+            for i in range(1, knownlore.level + 1):
+                knownlorelevels.append(lore.text_of_level(i))
+
+            context['knownlore'] = knownlorelevels
 
         return render(request, self.template_name, context)
 
