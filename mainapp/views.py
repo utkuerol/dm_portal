@@ -90,19 +90,19 @@ class CampaignCreateView(CreateView):
 class CharacterCreateView(CreateView):
     model = Character
     template_name = 'new-character.html'
-    fields = '__all__'
+    fields = ['name', 'image', 'description', 'user', 'known_characters', 'known_locations', 'own_lore', 'known_lores']
 
     def form_valid(self, form):
         char = form.save(commit=False)
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        char.campaign = campaign
         char.save()
         for lore in list(Lore.objects.filter(campaign__character=char)):
             KnownLoreCharacter.objects.create(character=char, lore=lore, level=1)
 
         if char.own_lore:
             KnownLoreCharacter.objects.create(character=char, lore=char.own_lore, level=4)
-
-        campaign_id = self.kwargs['pk']
-        campaign = Campaign.objects.get(id=campaign_id)
 
         gm_char = Character.objects.get(campaign=campaign, name='Game Master')
 
@@ -126,18 +126,25 @@ class CharacterCreateView(CreateView):
         context = super(CharacterCreateView, self).get_context_data(**kwargs)
 
         context['campaign'] = campaign
+        context['form'].fields['known_characters'].queryset = Character.objects.filter(campaign=campaign)
+        context['form'].fields['known_lores'].queryset = Lore.objects.filter(campaign=campaign)
+        context['form'].fields['known_locations'].queryset = Location.objects.filter(campaign=campaign)
+        context['form'].fields['own_lore'].queryset = Lore.objects.filter(campaign=campaign)
+
         return context
 
 
 class LocationCreateView(CreateView):
     model = Location
     template_name = 'new-location.html'
-    fields = '__all__'
+    fields = ['name', 'description', 'important_characters', 'parent_location', 'own_lore']
 
     def form_valid(self, form):
-        form.save()
+        location = form.instance
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
+        location.campaign = campaign
+        location.save()
 
         gm_char = Character.objects.get(campaign=campaign, name='Game Master')
 
@@ -163,18 +170,25 @@ class LocationCreateView(CreateView):
         context = super(LocationCreateView, self).get_context_data(**kwargs)
 
         context['campaign'] = campaign
+        context['form'].fields['important_characters'].queryset = Character.objects.filter(campaign=campaign)
+        context['form'].fields['parent_location'].queryset = Location.objects.filter(campaign=campaign)
+        context['form'].fields['own_lore'].queryset = Lore.objects.filter(campaign=campaign)
+
+
         return context
 
 
 class LoreCreateView(CreateView):
     model = Lore
     template_name = 'new-lore.html'
-    fields = '__all__'
+    fields = ['type', 'title', 'text_level1', 'text_level2', 'text_level3', 'text_level4']
 
     def form_valid(self, form):
-        form.save()
+        lore = form.instance
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
+        lore.campaign = campaign
+        lore.save()
 
         gm = campaign.game_master
         gm_char = Character.objects.get(user=gm)
@@ -201,6 +215,7 @@ class LoreCreateView(CreateView):
         context = super(LoreCreateView, self).get_context_data(**kwargs)
 
         context['campaign'] = campaign
+
         return context
 
 
@@ -395,7 +410,8 @@ class KnownLoreRemoveView(View):
         to_remove_lore_id = self.kwargs['toremoveloreid']
 
         current_char = Character.objects.get(id=current_char_id)
-        current_char.known_lores.remove(Lore.objects.get(id=to_remove_lore_id))
+        to_remove_knownlorechar = KnownLoreCharacter.objects.get(character=current_char_id, lore=to_remove_lore_id)
+        to_remove_knownlorechar.delete()
         current_char.save()
 
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
@@ -423,7 +439,8 @@ class KnownLoreAddView(View):
         to_add_lore_id = self.kwargs['toaddloreid']
 
         current_char = Character.objects.get(id=current_char_id)
-        KnownLoreCharacter.objects.create(character=current_char, lore=Lore.objects.get(id=to_add_lore_id))
+        if not KnownLoreCharacter.objects.filter(character=current_char, lore=to_add_lore_id).exists():
+            KnownLoreCharacter.objects.create(character=current_char, lore=Lore.objects.get(id=to_add_lore_id))
 
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
