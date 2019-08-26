@@ -18,7 +18,7 @@ class Campaign(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=10000, null=False)
     players = models.ManyToManyField(User, related_name="players", blank=True)
-    game_master = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="game_master")
+    game_master = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="game_master")
     setting = models.ForeignKey(Setting, on_delete=models.SET_NULL, related_name="setting", null=True, blank=True)
 
     def get_absolute_url(self):
