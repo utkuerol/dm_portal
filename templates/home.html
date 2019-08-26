@@ -5,15 +5,25 @@
 
     {% if user.is_authenticated %}
 
-        <p class="text-grey-darker text-center text-lg mt-5">Welcome {{ user.username }}</p>
+        <div class="jumbotron text-center bg-primary">
+            <h1 class="display-5">Welcome {{ user.username }} !</h1>
+
+        </div>
+
 
     {% else %}
 
-        <div class="card" style="width: 25%;">
-            <div class="card-body" >
-                <a href="{% url 'register' %}"><h5 class="card-title" style="text-align: center">Sign Up</h5></a>
-            </div>
+        <div class="jumbotron">
+            <h1 class="display-3">Hello!</h1>
+            <p class="lead">Are you eager to take part in an adventure or create your own and play the god for once?</p>
+             <p class="lead"> Sign up below and get started! </p>
+            <hr class="my-4">
+            <p>Still in development. So stop whining and send bug reports!</p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="{% url 'register' %}" role="button">Sign up</a>
+            </p>
         </div>
+
     {% endif %}
 
 {% endblock %}
