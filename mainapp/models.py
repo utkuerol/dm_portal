@@ -18,8 +18,8 @@ class Campaign(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
     description = models.CharField(max_length=10000, null=False)
     players = models.ManyToManyField(User, related_name="players", blank=True)
-    game_master = models.ForeignKey(User, on_delete=models.CASCADE, related_name="game_master")
-    setting = models.ForeignKey(Setting, on_delete=models.CASCADE, related_name="setting", null=True, blank=True)
+    game_master = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="game_master")
+    setting = models.ForeignKey(Setting, on_delete=models.SET_NULL, related_name="setting", null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse('campaign-profile', kwargs={'pk': self.pk})
@@ -33,8 +33,8 @@ class Location(models.Model):
     description = models.CharField(max_length=10000, null=False)
     campaign = models.ManyToManyField(Campaign)
     important_characters = models.ManyToManyField("Character", blank=True)
-    parent_location = models.ForeignKey("Location", on_delete=models.CASCADE, null=True, blank=True)
-    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True)
+    parent_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True)
+    own_lore = models.ForeignKey("Lore", on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -57,7 +57,7 @@ class Character(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     known_characters = models.ManyToManyField("Character", blank=True)
     known_locations = models.ManyToManyField("Location", blank=True)
-    own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True, related_name="own_lore")
+    own_lore = models.ForeignKey("Lore", on_delete=models.SET_NULL, null=True, blank=True, related_name="own_lore")
     known_lores = models.ManyToManyField("Lore", null=True, blank=True, related_name="known_lores", through="KnownLoreCharacter")
 
     def __str__(self):
