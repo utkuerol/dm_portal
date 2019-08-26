@@ -51,14 +51,14 @@ class Location(models.Model):
 
 class Character(models.Model):
     name = models.CharField(max_length=100, null=False, unique=False)
-    image = models.ImageField(upload_to="media", null=True, default="images/dm.jpg")
-    description = models.CharField(max_length=10000, null=False, default='The one and only')
+    image = models.ImageField(upload_to="media", null=True, default="images/default_char.jpg")
+    description = models.CharField(max_length=10000, blank=True)
     campaign = models.ForeignKey("Campaign", on_delete=models.CASCADE, null=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     known_characters = models.ManyToManyField("Character", blank=True)
     known_locations = models.ManyToManyField("Location", blank=True)
     own_lore = models.ForeignKey("Lore", on_delete=models.CASCADE, null=True, blank=True, related_name="own_lore")
-    known_lores = models.ManyToManyField("Lore", blank=True, related_name="known_lores", through="KnownLoreCharacter")
+    known_lores = models.ManyToManyField("Lore", null=True, blank=True, related_name="known_lores", through="KnownLoreCharacter")
 
     def __str__(self):
         return self.name

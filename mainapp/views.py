@@ -58,7 +58,8 @@ class CampaignCreateView(CreateView):
         campaign = Campaign.objects.get(id=id)
         user = campaign.game_master
 
-        gm_char = Character(name='Game Master', campaign=campaign, user=user)
+        gm_char = Character(name='Game Master', campaign=campaign, user=user, description="The one and only",
+                            image="images/dm.jpg")
         gm_char.save()
 
         all_chars = list(Character.objects.filter(campaign=campaign))
@@ -98,7 +99,8 @@ class CharacterCreateView(CreateView):
         campaign = Campaign.objects.get(id=campaign_id)
         char.campaign = campaign
         char.save()
-        for lore in list(Lore.objects.filter(campaign__character=char)):
+
+        for lore in list(form.cleaned_data['known_lores']):
             KnownLoreCharacter.objects.create(character=char, lore=lore, level=1)
 
         if char.own_lore:
@@ -173,7 +175,6 @@ class LocationCreateView(CreateView):
         context['form'].fields['important_characters'].queryset = Character.objects.filter(campaign=campaign)
         context['form'].fields['parent_location'].queryset = Location.objects.filter(campaign=campaign)
         context['form'].fields['own_lore'].queryset = Lore.objects.filter(campaign=campaign)
-
 
         return context
 
@@ -489,7 +490,8 @@ class CharacterProfileView(View):
             for i in range(1, own_lore_knownlore.level + 1):
                 knownlorelevels.append(own_lore_knownlore.lore.text_of_level(i))
         else:
-            knownlorelevels.append("The old librarian comes back to tell you that he couldn't find anything useful on this character")
+            knownlorelevels.append(
+                "The old librarian comes back to tell you that he couldn't find anything useful on this character")
 
         context = dict()
         context['campaign'] = campaign
@@ -615,7 +617,8 @@ class LocationProfileView(View):
             for i in range(1, own_lore_knownlore.level + 1):
                 knownlorelevels.append(own_lore_knownlore.lore.text_of_level(i))
         else:
-            knownlorelevels.append("The old librarian comes back to tell you that he couldn't find anything useful on this character")
+            knownlorelevels.append(
+                "The old librarian comes back to tell you that he couldn't find anything useful on this character")
 
         context = dict()
         context['campaign'] = campaign
