@@ -119,7 +119,7 @@ class SessionProfileView(DetailView):
         session = Session.objects.get(id=session_id)
         context['campaign'] = campaign
         context['character_sessions'] = CharacterSession.objects.filter(session=session)
-
+        context['session'] = session
         return context
 
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
