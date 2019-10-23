@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from django.views.generic.base import View
 
-from mainapp.models import Character, Campaign, Location, Lore, KnownLoreCharacter
+from mainapp.models import Character, Campaign, Location, Lore, KnownLoreCharacter, Session, CharacterSession
 
 
 # home
@@ -88,6 +88,62 @@ class CampaignCreateView(CreateView):
         return response
 
 
+class SessionCreateView(CreateView):
+    model = Session
+    template_name = 'new-session.html'
+    fields = ['order', 'description', 'game_master_log']
+
+    def form_valid(self, form):
+        session = form.save(commit=False)
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        session.campaign = campaign
+        session.save()
+
+        for char in list(Character.objects.filter(campaign=campaign)):
+            CharacterSession.objects.create(character=char, session=session)
+
+        return redirect('session-profile', pk=self.kwargs['pk'], sessionid=session.id)
+
+
+class SessionProfileView(DetailView):
+    model = Session
+    template_name = 'session.html'
+    context_object_name = 'session'
+
+    def get_context_data(self, **kwargs):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context = super(SessionProfileView, self).get_context_data(**kwargs)
+        session_id = self.kwargs['sessionid']
+        session = Session.objects.get(id=session_id)
+        context['campaign'] = campaign
+        context['character_sessions'] = CharacterSession.objects.filter(session=session)
+
+        return context
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(SessionProfileView, self).dispatch(*args, **kwargs)
+
+
+class SessionsView(ListView):
+    model = Session
+    template_name = 'sessions.html'
+    context_object_name = 'sessions'
+
+    def get_queryset(self):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        sessions = Session.objects.filter(campaign=campaign).order_by('order')
+
+        return sessions
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(SessionsView, self).dispatch(*args, **kwargs)
+
+
 class CharacterCreateView(CreateView):
     model = Character
     template_name = 'new-character.html'
@@ -135,6 +191,10 @@ class CharacterCreateView(CreateView):
 
         return context
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(CharacterCreateView, self).dispatch(*args, **kwargs)
+
 
 class LocationCreateView(CreateView):
     model = Location
@@ -178,6 +238,10 @@ class LocationCreateView(CreateView):
 
         return context
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(LocationCreateView, self).dispatch(*args, **kwargs)
+
 
 class LoreCreateView(CreateView):
     model = Lore
@@ -219,8 +283,9 @@ class LoreCreateView(CreateView):
 
         return context
 
-
-# campaign page
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(LoreCreateView, self).dispatch(*args, **kwargs)
 
 
 class CampaignProfileView(DetailView):
@@ -403,6 +468,10 @@ class KnownCharacterRemoveView(View):
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(KnownCharacterRemoveView, self).dispatch(*args, **kwargs)
+
 
 class KnownLoreRemoveView(View):
 
@@ -418,6 +487,10 @@ class KnownLoreRemoveView(View):
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(KnownLoreRemoveView, self).dispatch(*args, **kwargs)
+
 
 class KnownCharacterAddView(View):
 
@@ -432,6 +505,10 @@ class KnownCharacterAddView(View):
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(KnownCharacterAddView, self).dispatch(*args, **kwargs)
+
 
 class KnownLoreAddView(View):
 
@@ -445,6 +522,10 @@ class KnownLoreAddView(View):
 
         return redirect('character-profile', pk=self.kwargs['pk'], charid=self.kwargs['charid'],
                         knowncharid=self.kwargs['knowncharid'])
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(KnownLoreAddView, self).dispatch(*args, **kwargs)
 
 
 class UpdateKnownLoreLevelView(View):
@@ -464,8 +545,10 @@ class UpdateKnownLoreLevelView(View):
         messages.success(request, 'Lore level updated for the character')
         return JsonResponse({'success': True})
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(UpdateKnownLoreLevelView, self).dispatch(*args, **kwargs)
 
-# campaign model profiles
 
 class CharacterProfileView(View):
     template_name = 'character.html'
@@ -533,6 +616,10 @@ class CharacterUpdateView(UpdateView):
             KnownLoreCharacter.objects.create(character=char, lore=char.own_lore, level=4)
         return super().form_valid(form)
 
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(CharacterUpdateView, self).dispatch(*args, **kwargs)
+
 
 class LoreProfileView(View):
     model = Character
@@ -590,6 +677,10 @@ class LoreUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('lore-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
                                              self.kwargs['loreid']])
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(LoreUpdateView, self).dispatch(*args, **kwargs)
 
 
 class LocationProfileView(View):
@@ -652,6 +743,10 @@ class LocationUpdateView(UpdateView):
     def get_success_url(self):
         return reverse('location-profile', args=[self.kwargs['pk'], self.kwargs['charid'],
                                                  self.kwargs['locationid']])
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(LocationUpdateView, self).dispatch(*args, **kwargs)
 
 
 class NavLoader(View):

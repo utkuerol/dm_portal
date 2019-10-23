@@ -1,0 +1,23 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} Sessions {% endblock %}
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
+
+{% block content %}
+
+    <div class="card-columns">
+        {% for session in sessions %}
+            <div class="card">
+                <div class="card-body">
+                    <a href="{% url 'session-profile' pk=request.resolver_match.kwargs.pk sessionid=session.id %}">
+                        <h5 class="card-title">Session {{ session.order }}</h5>
+                    </a>
+                    <p class="card-text">{{ session.description }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

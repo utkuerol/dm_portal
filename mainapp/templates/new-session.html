@@ -1,0 +1,17 @@
+{% extends 'campaign-layout.html' %}
+
+{% block title %} Campaign Home {% endblock %}
+
+{% block campaign_name %} {{ campaign.name }}{% endblock %}
+{% block gm_name %} {{ campaign.game_master.username }}{% endblock %}
+
+
+
+{% block content %}
+
+    <form method="post" enctype='multipart/form-data'>{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save">
+    </form>
+
+{% endblock %}

@@ -27,10 +27,14 @@ class Campaign(models.Model):
     def __str__(self):
         return self.name
 
+class Session(models.Model):
+    order = models.IntegerField()
+    description = models.CharField(max_length=1000, blank=True)
+    campaign = models.ForeignKey("Campaign", null=True, on_delete=models.SET_NULL)
 
 class Location(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
-    description = models.CharField(max_length=10000, null=False)
+    description = models.CharField(max_length=1000, null=False)
     campaign = models.ManyToManyField(Campaign)
     important_characters = models.ManyToManyField("Character", blank=True)
     parent_location = models.ForeignKey("Location", on_delete=models.SET_NULL, null=True, blank=True)
@@ -58,7 +62,8 @@ class Character(models.Model):
     known_characters = models.ManyToManyField("Character", blank=True)
     known_locations = models.ManyToManyField("Location", blank=True)
     own_lore = models.ForeignKey("Lore", on_delete=models.SET_NULL, null=True, blank=True, related_name="own_lore")
-    known_lores = models.ManyToManyField("Lore", null=True, blank=True, related_name="known_lores", through="KnownLoreCharacter")
+    known_lores = models.ManyToManyField("Lore", blank=True, related_name="known_lores", through="KnownLoreCharacter")
+    sessions = models.ManyToManyField("Session", blank=True, related_name="character_sessions", through="CharacterSession")
 
     def __str__(self):
         return self.name
@@ -97,8 +102,15 @@ class Lore(models.Model):
         else:
             return "Something doesn't seem right on the server :("
 
+# M-N Objects
+
 class KnownLoreCharacter(models.Model):
     character = models.ForeignKey("Character", on_delete=models.CASCADE)
     lore = models.ForeignKey("Lore", on_delete=models.CASCADE)
     level = models.IntegerField(default=1,
                                 null=False, unique=False)
+
+class CharacterSession(models.Model):
+    character = models.ForeignKey("Character", on_delete=models.CASCADE)
+    session = models.ForeignKey("Session", on_delete=models.CASCADE)
+    character_log = models.TextField(blank=True)

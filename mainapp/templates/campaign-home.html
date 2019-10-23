@@ -66,6 +66,8 @@
                 <div class="card-header">Manage Campaign</div>
                 <div class="card-body">
                     <h5 class="card-title"><a href="{% url 'campaign-update' pk=campaign.id %}">Edit Campaign</a></h5>
+                    <h5 class="card-title"><a href="{% url 'new-session' pk=campaign.id %}">New Session</a></h5>
+
                     <h5 class="card-title"><a href="#">Delete Campaign</a></h5>
                 </div>
             </div>
