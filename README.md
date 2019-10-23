@@ -1,4 +1,4 @@
-# Dungeon Master's Portal
+# Game Master's Workshop
 
 Web Platform for managing tabletop RPGs.
 
