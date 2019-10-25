@@ -1,4 +1,4 @@
 .idea
-media/media
 venv
 mainapp/migrations
+__pycache__/
