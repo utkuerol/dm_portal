@@ -119,6 +119,12 @@ class SessionProfileView(DetailView):
     template_name = 'session.html'
     context_object_name = 'session'
 
+    def get_object(self, queryset=None):
+        session_id = self.kwargs['sessionid']
+        session = Session.objects.get(id=session_id)
+        return session
+
+
     def get_context_data(self, **kwargs):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
