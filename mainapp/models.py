@@ -31,6 +31,7 @@ class Session(models.Model):
     order = models.IntegerField()
     description = models.CharField(max_length=1000, blank=True)
     campaign = models.ForeignKey("Campaign", null=True, on_delete=models.SET_NULL)
+    game_master_log = models.TextField(blank=True)
 
 class Location(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)

@@ -10,7 +10,7 @@
         {% for session in sessions %}
             <div class="card">
                 <div class="card-body">
-                    <a href="{% url 'session-profile' pk=request.resolver_match.kwargs.pk sessionid=session.id %}">
+                    <a href="{% url 'session-profile' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid sessionid=session.id %}">
                         <h5 class="card-title">Session {{ session.order }}</h5>
                     </a>
                     <p class="card-text">{{ session.description }}</p>

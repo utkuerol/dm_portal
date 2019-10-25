@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -12,7 +13,6 @@ from django.views.generic.base import View
 from mainapp.models import Character, Campaign, Location, Lore, KnownLoreCharacter, Session, CharacterSession
 
 
-# home
 
 class CharactersView(ListView):
     model = Character
@@ -43,8 +43,6 @@ class CampaignsView(ListView):
     def dispatch(self, *args, **kwargs):
         return super(CampaignsView, self).dispatch(*args, **kwargs)
 
-
-# dm creates
 
 class CampaignCreateView(CreateView):
     model = Campaign
@@ -93,17 +91,27 @@ class SessionCreateView(CreateView):
     template_name = 'new-session.html'
     fields = ['order', 'description', 'game_master_log']
 
+    def get_context_data(self, **kwargs):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
+        context = super(SessionCreateView, self).get_context_data(**kwargs)
+
+        context['campaign'] = campaign
+        return context
+
     def form_valid(self, form):
         session = form.save(commit=False)
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
         session.campaign = campaign
         session.save()
+        gm_char = Character.objects.get(campaign=campaign, user=campaign.game_master)
 
         for char in list(Character.objects.filter(campaign=campaign)):
             CharacterSession.objects.create(character=char, session=session)
 
-        return redirect('session-profile', pk=self.kwargs['pk'], sessionid=session.id)
+        return redirect('session-profile', pk=self.kwargs['pk'], charid=gm_char.id, sessionid=session.id)
 
 
 class SessionProfileView(DetailView):
@@ -114,11 +122,23 @@ class SessionProfileView(DetailView):
     def get_context_data(self, **kwargs):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
-        context = super(SessionProfileView, self).get_context_data(**kwargs)
+        charid = self.kwargs['charid']
+        char = Character.objects.get(id=charid)
         session_id = self.kwargs['sessionid']
         session = Session.objects.get(id=session_id)
+        gm_char = Character.objects.get(campaign=campaign, user=campaign.game_master)
+
+        context = super(SessionProfileView, self).get_context_data(**kwargs)
         context['campaign'] = campaign
-        context['character_sessions'] = CharacterSession.objects.filter(session=session)
+
+        if self.request.user == campaign.game_master:
+            context['character_sessions'] = CharacterSession.objects.filter(session=session)
+        else:
+            character_sessions = list()
+            character_sessions.append(CharacterSession.objects.filter(session=session, character=gm_char).first())
+            character_sessions.append(CharacterSession.objects.filter(session=session, character=char).first())
+            context['character_sessions'] = character_sessions
+
         context['session'] = session
         return context
 
@@ -132,6 +152,15 @@ class SessionsView(ListView):
     template_name = 'sessions.html'
     context_object_name = 'sessions'
 
+    def get_context_data(self, **kwargs):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+
+        context = super(SessionsView, self).get_context_data(**kwargs)
+
+        context['campaign'] = campaign
+        return context
+
     def get_queryset(self):
         campaign_id = self.kwargs['pk']
         campaign = Campaign.objects.get(id=campaign_id)
@@ -142,6 +171,57 @@ class SessionsView(ListView):
     @method_decorator(user_passes_test(lambda u: u.is_authenticated))
     def dispatch(self, *args, **kwargs):
         return super(SessionsView, self).dispatch(*args, **kwargs)
+
+
+class SessionUpdateView(UpdateView):
+    model = Session
+    template_name = 'session-update.html'
+    fields = ['order', 'description', 'game_master_log']
+
+    def get_object(self, queryset=None):
+        session_id = self.kwargs['sessionid']
+        session = Session.objects.get(id=session_id)
+        return session
+
+    def get_success_url(self):
+        return reverse('session-profile', args=[self.kwargs['pk'], self.kwargs['charid'], self.kwargs['sessionid']])
+
+    def get_context_data(self, **kwargs):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context = super(SessionUpdateView, self).get_context_data(**kwargs)
+        context['campaign'] = campaign
+        return context
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(SessionUpdateView, self).dispatch(*args, **kwargs)
+
+
+class CharacterSessionUpdateView(UpdateView):
+    model = CharacterSession
+    template_name = 'character-session-update.html'
+    fields = ['character_log']
+
+    def get_object(self, queryset=None):
+        char_session_id = self.kwargs['charactersessionid']
+        char_session = CharacterSession.objects.get(id=char_session_id)
+        return char_session
+
+    def get_success_url(self):
+        return reverse('session-profile', args=[self.kwargs['pk'], self.kwargs['charid'], self.kwargs['sessionid']])
+
+    def get_context_data(self, **kwargs):
+        campaign_id = self.kwargs['pk']
+        campaign = Campaign.objects.get(id=campaign_id)
+        context = super(CharacterSessionUpdateView, self).get_context_data(**kwargs)
+        context['campaign'] = campaign
+        return context
+
+
+    @method_decorator(user_passes_test(lambda u: u.is_authenticated))
+    def dispatch(self, *args, **kwargs):
+        return super(CharacterSessionUpdateView, self).dispatch(*args, **kwargs)
 
 
 class CharacterCreateView(CreateView):

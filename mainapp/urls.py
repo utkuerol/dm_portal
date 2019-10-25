@@ -5,7 +5,8 @@ from mainapp.views import CampaignsView, CharactersView, \
     LoreProfileView, LocationProfileView, CharacterProfileView, CampaignCreateView, CampaignUpdateView, \
     MyCharactersView, CharacterCreateView, LocationCreateView, LoreCreateView, NavLoader, KnownCharacterRemoveView, \
     KnownLoreRemoveView, KnownLoreAddView, KnownCharacterAddView, UpdateKnownLoreLevelView, CharacterUpdateView, \
-    LocationUpdateView, LoreUpdateView, SessionCreateView, SessionProfileView, SessionsView
+    LocationUpdateView, LoreUpdateView, SessionCreateView, SessionProfileView, SessionsView, SessionUpdateView, \
+    CharacterSessionUpdateView
 
 urlpatterns = [
     path('campaigns/', CampaignsView.as_view(), name='campaigns'),
@@ -13,8 +14,14 @@ urlpatterns = [
     path('campaigns/new', CampaignCreateView.as_view(), name='new-campaign'),
     path('campaigns/<int:pk>/update', CampaignUpdateView.as_view(), name='campaign-update'),
     path('campaigns/<int:pk>/sessions/new', SessionCreateView.as_view(), name='new-session'),
-    path('campaigns/<int:pk>/sessions/<int:sessionid>', SessionProfileView.as_view(), name='session-profile'),
-    path('campaigns/<int:pk>/sessions/', SessionsView.as_view(), name='sessions'),
+    path('campaigns/<int:pk>/<int:charid>/sessions/<int:sessionid>', SessionProfileView.as_view(),
+         name='session-profile'),
+    path('campaigns/<int:pk>/<int:charid>/sessions/', SessionsView.as_view(), name='sessions'),
+    path('campaigns/<int:pk>/<int:charid>/sessions/<int:sessionid>/update', SessionUpdateView.as_view(),
+         name='session-update'),
+    path('campaigns/<int:pk>/<int:charid>/sessions/<int:sessionid>/<int:charactersessionid>/update',
+         CharacterSessionUpdateView.as_view(),
+         name='character-session-update'),
 
     path('campaigns/<int:pk>', CampaignProfileView.as_view(), name='campaign-profile'),
     path('campaigns/<int:pk>/<int:charid>', CampaignProfileView.as_view(), name='campaign-character-profile'),

@@ -7,10 +7,17 @@
 
 {% block content %}
 
-    <div class="card bg-primary">
+    <div class="card">
         <div class="card-body">
             <h5 class="card-title">Session Order: {{ session.order }}</h5>
-            <p class="card-text">{{ session.description }}</p>
+            <p class="card-subtitle mb-2 text-muted">{{ session.description }}</p>
+            {% if user == campaign.game_master %}
+                <hr>
+                <p class="card-text">Game Master's Log (Hidden From Players):</p>
+                <p class="card-text">{{ session.game_master_log }}</p>
+                <a href="{% url 'session-update' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid sessionid=session.id %}"
+                   class="card-link">Edit</a>
+            {% endif %}
         </div>
     </div>
 
@@ -18,8 +25,16 @@
         {% for character_session in character_sessions %}
             <div class="card">
                 <div class="card-body" style="position: relative">
-                    <h5 class="card-title">{{ character_session.character.name }}</h5>
-                    <p class="card-text">{{ character_session.character_log }}</p>
+                    {% if character_session.character == Null %}
+                        <h5 class="card-title">It looks like you missed this session :(</h5>
+                    {% else %}
+                        <h5 class="card-title">{{ character_session.character.name }}</h5>
+                        <p class="card-text">{{ character_session.character_log }}</p>
+                        {% if user == campaign.game_master or request.resolver_match.kwargs.charid == character_session.character.id %}
+                            <a href="{% url 'character-session-update' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid sessionid=session.id charactersessionid=character_session.id %}"
+                               class="card-link">Edit</a>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}

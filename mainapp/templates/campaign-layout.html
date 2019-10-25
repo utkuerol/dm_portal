@@ -54,9 +54,8 @@
 
     {% if request.resolver_match.kwargs.charid %}
         $("#collapsibleNavbar").load("{% url 'loadnav-with-char' pk=request.resolver_match.kwargs.pk charid=request.resolver_match.kwargs.charid%}");
-    {% else %}
+    {% elif request.resolver_match.kwargs.pk %}
         $("#collapsibleNavbar").load("{% url 'loadnav' pk=request.resolver_match.kwargs.pk %}");
-
     {% endif %}
 
 
