@@ -16,17 +16,18 @@ import os
 from django.template.backends import django
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# TODO read from environment variable
 SECRET_KEY = 'pf8znp##x5ovz-g0uml4uaqhy^#j(#3omn*50@4maw-k@$z=7a'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
+# TODO not safe
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -116,15 +117,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL='/static/'
+STATIC_ROOT=os.path.join(BASE_DIR, 'static/')
+MEDIA_URL='/media/'
+MEDIA_ROOT=os.path.join(BASE_DIR, 'media/')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"), # your static/ files folder
-]
 
 # redirect after login
 
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'home'
 
-MEDIA_URL = "/media/"
