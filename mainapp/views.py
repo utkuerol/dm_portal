@@ -106,7 +106,7 @@ class SessionCreateView(CreateView):
         campaign = Campaign.objects.get(id=campaign_id)
         session.campaign = campaign
         session.save()
-        gm_char = Character.objects.get(campaign=campaign, user=campaign.game_master)
+        gm_char = Character.objects.get(name='Game Master', campaign=campaign, user=campaign.game_master)
 
         for char in list(Character.objects.filter(campaign=campaign)):
             CharacterSession.objects.create(character=char, session=session)
@@ -126,7 +126,7 @@ class SessionProfileView(DetailView):
         char = Character.objects.get(id=charid)
         session_id = self.kwargs['sessionid']
         session = Session.objects.get(id=session_id)
-        gm_char = Character.objects.get(campaign=campaign, user=campaign.game_master)
+        gm_char = Character.objects.get(name='Game Master', campaign=campaign, user=campaign.game_master)
 
         context = super(SessionProfileView, self).get_context_data(**kwargs)
         context['campaign'] = campaign
